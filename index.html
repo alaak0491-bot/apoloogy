@@ -9,8 +9,8 @@
             --primary-color: #ff4a5a;
             --bg-dark: #121212;
             --card-bg: #1e1e1e;
-            --puzzle-size: 320px; /* مقاس اللوحة بالكامل مناسب للموبايل */
-            --tile-size: 80px;  /* مقاس القطعة الواحدة (320 ÷ 4) */
+            --puzzle-size: 320px; 
+            --tile-size: 80px;  
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
@@ -40,7 +40,6 @@
 
         h2 { color: var(--primary-color); margin-bottom: 15px; font-size: 22px; }
 
-        /* لوحة اللعبة */
         #puzzle-board {
             width: var(--puzzle-size);
             height: var(--puzzle-size);
@@ -56,13 +55,12 @@
         }
 
         .tile {
-            width: var(--tile-size);
-            height: var(--tile-size);
-            background-image: url('salma.jpeg'); /* اسم صورتكم الشخصية المربعة */
+            width: 100%;
+            height: 100%;
+            background-image: url('salma.jpeg'); 
             background-size: var(--puzzle-size) var(--puzzle-size);
             cursor: grab;
-            touch-action: none; /* تمنع الشاشة من الـ scroll أثناء السحب */
-            transition: transform 0.1s ease;
+            touch-action: none; 
         }
 
         .tile:active { cursor: grabbing; }
@@ -89,7 +87,6 @@
 
         button:hover { transform: scale(1.05); background: #e03e4d; }
 
-        /* الرسالة والمحضر */
         .apology-box p { font-size: 18px; line-height: 1.7; margin-bottom: 20px; }
         .treaty-box { text-align: right; background: #252525; padding: 20px; border-radius: 15px; border-left: 5px solid var(--primary-color); }
         .treaty-box h3 { text-align: center; color: var(--primary-color); margin-bottom: 15px; }
@@ -133,51 +130,47 @@
 
     <script>
         const board = document.getElementById('puzzle-board');
-        const size = 4; // 4x4
-        let tilesOrder = []; // الترتيب الحالي للقطع
+        const size = 4; 
+        let dragSrcEl = null;
 
-        // توليد ترتيب عشوائي متلخبط للقطع (من 0 لـ 15)
+        // توليد ترتيب عشوائي متلخبط للقطع
         function getShuffledOrder() {
             let arr = Array.from({length: size * size}, (_, i) => i);
-            // لخبطة المصفوفة
             do {
                 arr.sort(() => Math.random() - 0.5);
-            } while (isSorted(arr)); // نتأكد إنها مش طالعة مترتبة بالصدفة
+            } while (arr.every((val, i) => val === i)); 
             return arr;
         }
 
-        function isSorted(arr) {
-            return arr.every((val, i) => val === i);
-        }
-
-        // إنشاء لوحة الـ Puzzle
         function createPuzzle() {
-            tilesOrder = getShuffledOrder();
+            const shuffled = getShuffledOrder();
             board.innerHTML = '';
 
-            tilesOrder.forEach((posIndex, currentGridIndex) => {
+            // بنمشي على الـ 16 خانة بتوع الشبكة بالترتيب من 0 لـ 15
+            for (let i = 0; i < size * size; i++) {
                 const tile = document.createElement('div');
                 tile.classList.add('tile');
                 tile.setAttribute('draggable', 'true');
-                tile.setAttribute('data-correct-id', posIndex); // المكان الصح للقطعة
-                tile.setAttribute('data-current-index', currentGridIndex); // المكان الحالي في الشبكة
+                
+                // الخانة الحالية في الشبكة
+                tile.setAttribute('data-grid-id', i); 
+                
+                // القطعة العشوائية اللي حطينها في الخانة دي
+                const correctId = shuffled[i];
+                tile.setAttribute('data-correct-id', correctId); 
 
-                // حساب الجزء الصحيح من الصورة لكل قطعة
-                const correctRow = Math.floor(posIndex / size);
-                const correctCol = posIndex % size;
+                // حساب خلفية الصورة بناءً على الـ correctId الأصلي بتاعها
+                const correctRow = Math.floor(correctId / size);
+                const correctCol = correctId % size;
                 tile.style.backgroundPosition = `-${correctCol * 80}px -${correctRow * 80}px`;
 
-                // إضافة أحداث السحب والإفلات (للكمبيوتر والموبايل)
                 addDragAndDropEvents(tile);
-
                 board.appendChild(tile);
-            });
+            }
         }
 
-        let dragSrcEl = null;
-
         function addDragAndDropEvents(tile) {
-            // أحداث الماوس (الكمبيوتر)
+            // الكمبيوتر
             tile.addEventListener('dragstart', handleDragStart);
             tile.addEventListener('dragover', handleDragOver);
             tile.addEventListener('dragenter', handleDragEnter);
@@ -185,13 +178,12 @@
             tile.addEventListener('drop', handleDrop);
             tile.addEventListener('dragend', handleDragEnd);
 
-            // دعم اللمس للموبايل (Touch Events) باستخدام محاكاة السحب
+            // الموبايل
             tile.addEventListener('touchstart', handleTouchStart, {passive: false});
             tile.addEventListener('touchmove', handleTouchMove, {passive: false});
             tile.addEventListener('touchend', handleTouchEnd);
         }
 
-        // دالات السحب للكمبيوتر
         function handleDragStart(e) {
             dragSrcEl = this;
             e.dataTransfer.effectAllowed = 'move';
@@ -208,9 +200,7 @@
 
         function handleDrop(e) {
             if (e.stopPropagation) e.stopPropagation();
-            
             if (dragSrcEl !== this) {
-                // تبديل الداتا والخلفيات بين القطعتين
                 swapTilesData(dragSrcEl, this);
                 checkWin();
             }
@@ -222,7 +212,7 @@
             document.querySelectorAll('.tile').forEach(t => t.classList.remove('over'));
         }
 
-        // تبديل البيانات ومظهر القطع
+        // تبديل البيانات الكاملة بين القطعتين
         function swapTilesData(tile1, tile2) {
             const t1CorrectId = tile1.getAttribute('data-correct-id');
             const t1BgPos = tile1.style.backgroundPosition;
@@ -234,7 +224,7 @@
             tile2.style.backgroundPosition = t1BgPos;
         }
 
-        // دعم الموبايل (Touch)
+        // اللمس للموبايل
         let touchStartTile = null;
 
         function handleTouchStart(e) {
@@ -242,14 +232,11 @@
             this.style.opacity = '0.5';
         }
 
-        function handleTouchMove(e) {
-            e.preventDefault(); // يمنع اهتزاز الصفحة أثناء السحب
-        }
+        function handleTouchMove(e) { e.preventDefault(); }
 
         function handleTouchEnd(e) {
             this.style.opacity = '1';
             const touch = e.changedTouches[0];
-            // معرفة العنصر اللي صباعها ساب الشاشة فوقه
             const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
             
             if (targetEl && targetEl.classList.contains('tile') && targetEl !== touchStartTile) {
@@ -258,16 +245,17 @@
             }
         }
 
-        // التأكد من الفوز
+        // دالة الفوز الجديدة والمضمونة
         function checkWin() {
             const allTiles = document.querySelectorAll('.tile');
             let isWin = true;
 
             allTiles.forEach(tile => {
-                const correctId = parseInt(tile.getAttribute('data-correct-id'));
-                const currentIndex = parseInt(tile.getAttribute('data-current-index'));
+                const gridId = tile.getAttribute('data-grid-id');
+                const correctId = tile.getAttribute('data-correct-id');
                 
-                if (correctId !== currentIndex) {
+                // لو رقم الخانة مش هو نفس رقم القطعة الصح، يبقى لسة مخلصتش
+                if (gridId !== correctId) {
                     isWin = false;
                 }
             });
@@ -276,7 +264,7 @@
                 setTimeout(() => {
                     document.getElementById('step-game').classList.add('hidden');
                     document.getElementById('step-apology').classList.remove('hidden');
-                }, 600);
+                }, 500);
             }
         }
 
@@ -289,7 +277,6 @@
             alert('تم الصلح بنجاح! ❤️ صافي يا لبن 🥛');
         }
 
-        // تشغيل اللعبة
         createPuzzle();
     </script>
 </body>
