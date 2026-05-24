@@ -134,6 +134,33 @@
             margin-top: 5px;
         }
         .btn-signature:hover { background: #f0f0f0; border-color: var(--primary-color); color: var(--primary-color); }
+
+        /* ستايل صفحة المفاجأة الأخيرة (3*3) */
+        .love-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 25px;
+        }
+        .love-gallery img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+        }
+        .love-title {
+            font-size: 32px;
+            color: var(--primary-color);
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -208,7 +235,23 @@
             </div>
         </div>
     </div>
-
+<div id="step-final-love" class="container hidden">
+        <div class="love-title">أنا بحبك ❤️</div>
+        <p style="margin-top: 5px; color: #ccc;">صافي يا لبن؟ 🥛 من برة وجوة أحلى ذكريات</p>
+        
+        <div class="love-gallery">
+            <img src="love1.jpg" alt="صورة 1">
+            <img src="love2.jpg" alt="صورة 2">
+            <img src="love3.jpg" alt="صورة 3">
+            <img src="love4.jpg" alt="صورة 4">
+            <img src="love5.jpg" alt="صورة 5">
+            <img src="love6.jpg" alt="صورة 6">
+            <img src="love7.jpg" alt="صورة 7">
+            <img src="love8.jpg" alt="صورة 8">
+            <img src="love9.jpg" alt="صورة 9">
+        </div>
+    </div>
+    
     <script>
         const slotsContainer = document.getElementById('puzzle-slots');
         const bankContainer = document.getElementById('pieces-bank');
