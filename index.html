@@ -9,7 +9,8 @@
             --primary-color: #ff4a5a;
             --bg-dark: #121212;
             --card-bg: #1e1e1e;
-            --puzzle-size: 320px; /* حجم اللعبة على الشاشة */
+            --puzzle-size: 320px; /* مقاس اللوحة بالكامل مناسب للموبايل */
+            --tile-size: 80px;  /* مقاس القطعة الواحدة (320 ÷ 4) */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
@@ -22,6 +23,8 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .container {
@@ -37,7 +40,7 @@
 
         h2 { color: var(--primary-color); margin-bottom: 15px; font-size: 22px; }
 
-        /* ستايل لوحة اللعبة */
+        /* لوحة اللعبة */
         #puzzle-board {
             width: var(--puzzle-size);
             height: var(--puzzle-size);
@@ -46,25 +49,27 @@
             grid-template-rows: repeat(4, 1fr);
             gap: 2px;
             margin: 20px auto;
-            border: 2px solid var(--primary-color);
-            background: #333;
-            position: relative;
+            border: 3px solid var(--primary-color);
+            background: #252525;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .tile {
-            width: 100%;
-            height: 100%;
-            background-image: url('salma.jpeg'); /* اسم الصورة الشخصية */
+            width: var(--tile-size);
+            height: var(--tile-size);
+            background-image: url('salma.jpeg'); /* اسم صورتكم الشخصية المربعة */
             background-size: var(--puzzle-size) var(--puzzle-size);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-radius: 2px;
+            cursor: grab;
+            touch-action: none; /* تمنع الشاشة من الـ scroll أثناء السحب */
+            transition: transform 0.1s ease;
         }
 
-        .tile.empty {
-            background-image: none;
-            background-color: var(--bg-dark);
-            cursor: default;
+        .tile:active { cursor: grabbing; }
+
+        .tile.over {
+            border: 2px dashed var(--primary-color);
+            opacity: 0.7;
         }
 
         .hidden { display: none !important; }
@@ -91,17 +96,18 @@
         .treaty-box ul { margin-right: 20px; list-style: none; }
         .treaty-box li { margin-bottom: 12px; position: relative; }
         .treaty-box li::before { content: "❤️"; position: absolute; right: -25px; }
-
     </style>
 </head>
 <body>
 
+    <!-- الخطوة 1: لعبة السحب والإفلات -->
     <div id="step-game" class="container">
-        <h2>جمعي صورتنا عشان تشوفي الرسالة 🧩</h2>
+        <h2>رّتبي صورتنا صح عشان تشوفي الرسالة 🧩</h2>
+        <p style="color: #aaa; font-size: 14px;">اسحبي القطع وبدلي أماكنهم لحد ما الصورة تظبط</p>
         <div id="puzzle-board"></div>
-        <p style="color: #888; font-size: 14px;">اضغطي على القطع المجاورة للمربع الفارغ لتحريكها</p>
     </div>
 
+    <!-- الخطوة 2: رسالة الاعتذار -->
     <div id="step-apology" class="container hidden">
         <h2>كسبتي يا قمر! 🥳 ❤️</h2>
         <div class="apology-box">
@@ -110,16 +116,17 @@
         </div>
     </div>
 
+    <!-- الخطوة 3: محضر الصلح -->
     <div id="step-treaty" class="container hidden">
         <div class="treaty-box">
             <h3>📜 محضر صلح رسمي 📜</h3>
             <ul>
-                <li><strong>أولاً:</strong> يتعهد الطرف الأول (أنا) بمراعاة قلب الطرف الثاني دائماً.</li>
-                <li><strong>ثانياً:</strong> يتم إلغاء أي زعل أو نكد بأثر رجعي من تاريخ اليوم.</li>
-                <li><strong>ثالثاً:</strong> يُنفذ حكم "التعويض الجميل" خروجة أو هدية في أقرب وقت.</li>
+                <li><strong>أولاً:</strong> يتعهد الطرف الأول (أنا) بمراعاة قلب الطرف الثاني دائماً ومصالحته فوراً.</li>
+                <li><strong>ثانياً:</strong> يتم إلغاء أي زعل أو نكد بأثر رجعي وتصفية النفوس تماماً.</li>
+                <li><strong>ثالثاً:</strong> يُنفذ حكم "التعويض الجميل" (خروجة وأكل) في أقرب وقت يناسب الطرف الثاني.</li>
             </ul>
             <div style="text-align: center;">
-                <button onclick="finalSuccess()">بصمة الموافقة ❤️</button>
+                <button onclick="finalSuccess()">بصمة الموافقة والصلح ❤️</button>
             </div>
         </div>
     </div>
@@ -127,86 +134,149 @@
     <script>
         const board = document.getElementById('puzzle-board');
         const size = 4; // 4x4
-        let tiles = [];
-        const emptyTile = { row: 3, col: 3 }; // المربع الفاضي في البداية
+        let tilesOrder = []; // الترتيب الحالي للقطع
 
-        // إنشاء القطع
-        function createPuzzle() {
-            const positions = [];
-            for (let i = 0; i < size * size; i++) positions.push(i);
-            
-            // لخبطة القطع (تأكد من ترك المربع الأخير فارغاً)
-            positions.sort(() => Math.random() - 0.5);
-
-            for (let i = 0; i < size * size; i++) {
-                const tile = document.createElement('div');
-                tile.classList.add('tile');
-                const pos = positions[i];
-                
-                if (pos === 15) { // المربع رقم 16 (الفاضي)
-                    tile.classList.add('empty');
-                    tile.id = 'empty-tile';
-                } else {
-                    const row = Math.floor(pos / size);
-                    const col = pos % size;
-                    // تحديد أي جزء من الصورة يظهر في المربع
-                    tile.style.backgroundPosition = `-${col * 80}px -${row * 80}px`;
-                    tile.setAttribute('data-pos', pos);
-                    tile.addEventListener('click', () => moveTile(i));
-                }
-                tiles.push(tile);
-                board.appendChild(tile);
-            }
+        // توليد ترتيب عشوائي متلخبط للقطع (من 0 لـ 15)
+        function getShuffledOrder() {
+            let arr = Array.from({length: size * size}, (_, i) => i);
+            // لخبطة المصفوفة
+            do {
+                arr.sort(() => Math.random() - 0.5);
+            } while (isSorted(arr)); // نتأكد إنها مش طالعة مترتبة بالصدفة
+            return arr;
         }
 
-        function moveTile(index) {
-            const emptyIndex = tiles.findIndex(t => t.classList.contains('empty'));
-            const row = Math.floor(index / size);
-            const col = index % size;
-            const emptyRow = Math.floor(emptyIndex / size);
-            const emptyCol = emptyIndex % size;
+        function isSorted(arr) {
+            return arr.every((val, i) => val === i);
+        }
 
-            // حساب هل المربع المختار بجانب المربع الفاضي؟
-            const isAdjacent = (Math.abs(row - emptyRow) === 1 && col === emptyCol) ||
-                              (Math.abs(col - emptyCol) === 1 && row === emptyRow);
+        // إنشاء لوحة الـ Puzzle
+        function createPuzzle() {
+            tilesOrder = getShuffledOrder();
+            board.innerHTML = '';
 
-            if (isAdjacent) {
-                // تبديل القطع في المصفوفة وفي الـ DOM
-                swapTiles(index, emptyIndex);
+            tilesOrder.forEach((posIndex, currentGridIndex) => {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                tile.setAttribute('draggable', 'true');
+                tile.setAttribute('data-correct-id', posIndex); // المكان الصح للقطعة
+                tile.setAttribute('data-current-index', currentGridIndex); // المكان الحالي في الشبكة
+
+                // حساب الجزء الصحيح من الصورة لكل قطعة
+                const correctRow = Math.floor(posIndex / size);
+                const correctCol = posIndex % size;
+                tile.style.backgroundPosition = `-${correctCol * 80}px -${correctRow * 80}px`;
+
+                // إضافة أحداث السحب والإفلات (للكمبيوتر والموبايل)
+                addDragAndDropEvents(tile);
+
+                board.appendChild(tile);
+            });
+        }
+
+        let dragSrcEl = null;
+
+        function addDragAndDropEvents(tile) {
+            // أحداث الماوس (الكمبيوتر)
+            tile.addEventListener('dragstart', handleDragStart);
+            tile.addEventListener('dragover', handleDragOver);
+            tile.addEventListener('dragenter', handleDragEnter);
+            tile.addEventListener('dragleave', handleDragLeave);
+            tile.addEventListener('drop', handleDrop);
+            tile.addEventListener('dragend', handleDragEnd);
+
+            // دعم اللمس للموبايل (Touch Events) باستخدام محاكاة السحب
+            tile.addEventListener('touchstart', handleTouchStart, {passive: false});
+            tile.addEventListener('touchmove', handleTouchMove, {passive: false});
+            tile.addEventListener('touchend', handleTouchEnd);
+        }
+
+        // دالات السحب للكمبيوتر
+        function handleDragStart(e) {
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            this.style.opacity = '0.4';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            return false;
+        }
+
+        function handleDragEnter(e) { this.classList.add('over'); }
+        function handleDragLeave(e) { this.classList.remove('over'); }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            
+            if (dragSrcEl !== this) {
+                // تبديل الداتا والخلفيات بين القطعتين
+                swapTilesData(dragSrcEl, this);
+                checkWin();
+            }
+            return false;
+        }
+
+        function handleDragEnd() {
+            this.style.opacity = '1';
+            document.querySelectorAll('.tile').forEach(t => t.classList.remove('over'));
+        }
+
+        // تبديل البيانات ومظهر القطع
+        function swapTilesData(tile1, tile2) {
+            const t1CorrectId = tile1.getAttribute('data-correct-id');
+            const t1BgPos = tile1.style.backgroundPosition;
+
+            tile1.setAttribute('data-correct-id', tile2.getAttribute('data-correct-id'));
+            tile1.style.backgroundPosition = tile2.style.backgroundPosition;
+
+            tile2.setAttribute('data-correct-id', t1CorrectId);
+            tile2.style.backgroundPosition = t1BgPos;
+        }
+
+        // دعم الموبايل (Touch)
+        let touchStartTile = null;
+
+        function handleTouchStart(e) {
+            touchStartTile = this;
+            this.style.opacity = '0.5';
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault(); // يمنع اهتزاز الصفحة أثناء السحب
+        }
+
+        function handleTouchEnd(e) {
+            this.style.opacity = '1';
+            const touch = e.changedTouches[0];
+            // معرفة العنصر اللي صباعها ساب الشاشة فوقه
+            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (targetEl && targetEl.classList.contains('tile') && targetEl !== touchStartTile) {
+                swapTilesData(touchStartTile, targetEl);
                 checkWin();
             }
         }
 
-        function swapTiles(idx1, idx2) {
-            const tempContent = tiles[idx1].style.backgroundPosition;
-            const tempClass = tiles[idx1].className;
-            const tempData = tiles[idx1].getAttribute('data-pos');
-
-            tiles[idx1].style.backgroundPosition = tiles[idx2].style.backgroundPosition;
-            tiles[idx1].className = tiles[idx2].className;
-            tiles[idx1].setAttribute('data-pos', tiles[idx2].getAttribute('data-pos'));
-
-            tiles[idx2].style.backgroundPosition = tempContent;
-            tiles[idx2].className = tempClass;
-            tiles[idx2].setAttribute('data-pos', tempData);
-        }
-
+        // التأكد من الفوز
         function checkWin() {
-            const currentOrder = tiles.map(t => t.getAttribute('data-pos')).join(',');
-            // الترتيب الصحيح للفوز
-            const winningOrder = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,null";
-            
-            // للتسهيل في التجربة: لو القطع مترتبة (باستثناء الفاضي)
-            let win = true;
-            for(let i=0; i<15; i++) {
-                if(tiles[i].getAttribute('data-pos') != i) win = false;
-            }
+            const allTiles = document.querySelectorAll('.tile');
+            let isWin = true;
 
-            if (win) {
+            allTiles.forEach(tile => {
+                const correctId = parseInt(tile.getAttribute('data-correct-id'));
+                const currentIndex = parseInt(tile.getAttribute('data-current-index'));
+                
+                if (correctId !== currentIndex) {
+                    isWin = false;
+                }
+            });
+
+            if (isWin) {
                 setTimeout(() => {
                     document.getElementById('step-game').classList.add('hidden');
                     document.getElementById('step-apology').classList.remove('hidden');
-                }, 500);
+                }, 600);
             }
         }
 
@@ -216,9 +286,10 @@
         }
 
         function finalSuccess() {
-            alert('تم الصلح يا روحي! ❤️');
+            alert('تم الصلح بنجاح! ❤️ صافي يا لبن 🥛');
         }
 
+        // تشغيل اللعبة
         createPuzzle();
     </script>
 </body>
