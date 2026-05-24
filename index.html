@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>apologize mission ❤️🌚</title>
+    <title>apologize mission ❤️🌚 </title>
     <style>
         :root {
             --primary-color: #ff4a5a;
@@ -11,14 +11,7 @@
             --card-bg: #1e1e1e;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Segoe UI', sans-serif; 
-            -webkit-user-select: none;
-            user-select: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
 
         body {
             background-color: var(--bg-dark);
@@ -28,6 +21,8 @@
             align-items: center;
             min-height: 100vh;
             padding: 15px;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .container {
@@ -44,18 +39,18 @@
         h2 { color: var(--primary-color); margin-bottom: 10px; font-size: 20px; }
         p { color: #aaa; font-size: 13px; margin-bottom: 15px; }
 
-        /* اللوحة الفاضية */
+        /* اللوحة الفاضية اللي هيتحط فيها الصور */
         #puzzle-slots {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-            width: 290px;
-            height: 290px;
+            gap: 3px;
+            width: 280px;
+            height: 280px;
             margin: 0 auto 20px auto;
             border: 3px solid var(--primary-color);
             background: #252525;
             border-radius: 8px;
-            padding: 4px;
+            padding: 3px;
         }
 
         .slot {
@@ -67,10 +62,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
         }
-        .slot:hover { background: #222; }
 
         /* مكان القطع المتلخبطة تحت */
         #pieces-bank {
@@ -88,19 +80,12 @@
             width: 60px;
             height: 60px;
             border-radius: 4px;
-            cursor: pointer;
+            cursor: grab;
+            touch-action: none;
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            border: 2px solid transparent;
-            transition: transform 0.2s, border-color 0.2s;
         }
 
-        /* ستايل القطعة لما يتم اختيارها */
-        .piece.selected {
-            border-color: var(--primary-color);
-            transform: scale(1.1);
-            box-shadow: 0 0 12px var(--primary-color);
-        }
-
+        .piece:active { cursor: grabbing; }
         .slot img { width: 100%; height: 100%; border-radius: 4px; }
 
         .hidden { display: none !important; }
@@ -114,7 +99,7 @@
 
         .apology-box p { font-size: 18px; line-height: 1.7; margin-bottom: 20px; }
 
-        /* محضر الصلح */
+        /* ستايل محضر الصلح المطور (الورقة الرسمية البيضاء) */
         .reconciliation-paper {
             background: white;
             color: black;
@@ -129,6 +114,223 @@
         .paper-title { text-align: center; font-weight: bold; font-size: 20px; text-decoration: underline; margin-bottom: 10px; color: #111; }
         .paper-subtitle { text-align: center; margin-bottom: 20px; font-weight: bold; color: #555; }
         
+        /* تنسيق الصور لتكون صغيرة وجنب بعضها */
+        .parties-images { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
+        .party { text-align: center; }
+        .party img { width: 65px; height: 65px; border-radius: 50%; border: 2px solid #333; object-fit: cover; }
+        .party-name { display: block; font-weight: bold; font-size: 13px; margin-top: 5px; color: #222; }
+
+        .content-section { margin-bottom: 15px; font-size: 15px; }
+        .content-section p { font-weight: bold; }
+        .content-section ul { list-style: none; padding-right: 15px; }
+        .content-section li { color: #333; }
+
+        .signature-section { margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        
+        .btn-signature {
+            background: none; border: 2px solid #333; color: #333;
+            padding: 6px 20px; cursor: pointer; font-weight: bold;
+            font-size: 15px; border-radius: 5px; transition: 0.3s;
+            margin-top: 5px;
+        }
+        .btn-signature:hover { background: #f0f0f0; border-color: var(--primary-color); color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div id="step-game" class="container">
+        <h2>Scan Successful 👏🏻 </h2>
+        <p>حلي ال puzzle دي بسرعه يا سلمي </p>
+        
+        <div id="puzzle-slots"></div>
+        
+        <div id="pieces-bank"></div>
+    </div>
+
+    <div id="step-apology" class="container hidden">
+        <h2>شطووورة يا سلمي 😂❤️</h2>
+        <div class="apology-box">
+            <p> I’m really sorry for my attitude</p>
+            <p> You didn’t deserve that at all</p>
+            <p> I was upset and handled it badly</p>
+            <p> و عشان اضمن انك مش زعلانه مني 🌚</p>
+            <button onclick="showTreaty()">📜 يلا نعمل معاهدة صلح </button>
+        </div>
+    </div>
+
+    <div id="step-treaty" class="container hidden" style="background: none; padding: 0;">
+        <div class="reconciliation-paper">
+            <div class="paper-title">محضر صلح رسمي</div>
+            <div class="paper-subtitle">الاطراف</div>
+
+            <div class="parties-images">
+                <div class="party">
+                    <img src="karim.jpg" alt="كريم">
+                    <span class="party-name">الطرف الأول </span>
+                </div>
+                <div class="party">
+                    <img src="salma (2).jpeg" alt="سلمى">
+                    <span class="party-name">الطرف الثاني </span>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <p>اتعهد انا / <strong>كريم</strong></p>
+                <p>بالاعتراف :</p>
+                <ul>
+                    <li>1- كنت بتصرف بغباء    </li>
+                    <li>2- مكنش ينفع اكلمك بالطريقة دي    </li>
+                    <li>3- اني ندمان علي كدا    </li>
+                    <li>4- بحاول اصلح الدنيا بشكل صح    </li>
+                    <li>5- اني فعلا بهتم بيكي يا سلمي    </li>
+                    <li>6- عارف انك هتموتيني 😂    </li>
+                </ul>
+            </div>
+
+            <div class="content-section">
+                <p>و بناءا عليه ، يرجى الموافقه على هذه الشروط :</p>
+                <ul>
+                    <li>1- متزعليش مني    </li>
+                    <li>2- خليكي راضيه عني    </li>
+                    <li>3- تصفي النفوس    </li>
+                </ul>
+            </div>
+
+            <div class="signature-section">
+                <div>
+                    <p style="font-size: 14px; color: #666;">إمضاء الطرف الثاني</p>
+                    <button class="btn-signature" onclick="finalCelebrate()">سلمى (احلي واحدة )</button>
+                </div>
+                <div style="text-align: left;">
+                    <p style="font-size: 14px; color: #666;">إمضاء الطرف الأول</p>
+                    <p style="font-weight: bold; font-size: 16px; margin-top: 5px;">كريم </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const slotsContainer = document.getElementById('puzzle-slots');
+        const bankContainer = document.getElementById('pieces-bank');
+        const totalPieces = 16;
+        let activeDragPiece = null;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>apologize mission ❤️🌚 </title>
+    <style>
+        :root {
+            --primary-color: #ff4a5a;
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            border: 1px solid #333;
+        }
+
+        h2 { color: var(--primary-color); margin-bottom: 10px; font-size: 20px; }
+        p { color: #aaa; font-size: 13px; margin-bottom: 15px; }
+
+        /* اللوحة الفاضية اللي هيتحط فيها الصور */
+        #puzzle-slots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 20px auto;
+            border: 3px solid var(--primary-color);
+            background: #252525;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .slot {
+            width: 100%;
+            height: 100%;
+            background: #151515;
+            border: 1px dashed #444;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* مكان القطع المتلخبطة تحت */
+        #pieces-bank {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            background: #252525;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            min-height: 120px;
+        }
+
+        .piece {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            cursor: grab;
+            touch-action: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .piece:active { cursor: grabbing; }
+        .slot img { width: 100%; height: 100%; border-radius: 4px; }
+
+        .hidden { display: none !important; }
+
+        button {
+            background: var(--primary-color); color: white; border: none;
+            padding: 12px 30px; font-size: 18px; font-weight: bold;
+            border-radius: 50px; cursor: pointer; margin-top: 20px; transition: 0.3s;
+        }
+        button:hover { transform: scale(1.05); background: #e03e4d; }
+
+        .apology-box p { font-size: 18px; line-height: 1.7; margin-bottom: 20px; }
+
+        /* ستايل محضر الصلح المطور (الورقة الرسمية البيضاء) */
+        .reconciliation-paper {
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            line-height: 1.8;
+            width: 100%;
+        }
+
+        .paper-title { text-align: center; font-weight: bold; font-size: 20px; text-decoration: underline; margin-bottom: 10px; color: #111; }
+        .paper-subtitle { text-align: center; margin-bottom: 20px; font-weight: bold; color: #555; }
+        
+        /* تنسيق صور الأطراف داخل المحضر */
         .parties-images { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
         .party { text-align: center; }
         .party img { width: 65px; height: 65px; border-radius: 50%; border: 2px solid #333; object-fit: cover; }
@@ -149,7 +351,7 @@
         }
         .btn-signature:hover { background: #f0f0f0; border-color: var(--primary-color); color: var(--primary-color); }
 
-        /* معرض الـ 9 صور */
+        /* ستايل صفحة المفاجأة الأخيرة (3*3) */
         .love-gallery {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -181,7 +383,7 @@
 
     <div id="step-game" class="container">
         <h2>Scan Successful 👏🏻 </h2>
-        <p>اختار قطعة من تحت، وبعدين دوس على المربع الفاضي فوق عشان تحطها 😉</p>
+        <p>حلي ال puzzle دي بسرعه يا سلمي </p>
         <div id="puzzle-slots"></div>
         <div id="pieces-bank"></div>
     </div>
@@ -222,7 +424,7 @@
                     <li>3- اني ندمان علي كدا</li>
                     <li>4- بحاول اصلح الدنيا بشكل صح</li>
                     <li>5- اني فعلا بهتم بيكي يا سلمي</li>
-                    <li>6- عارف انك هتموتيني 😂 </li>
+                    <li>6- عارف انك هتموتيني 😂    </li>
                 </ul>
             </div>
 
@@ -250,6 +452,7 @@
 
     <div id="step-final-love" class="container hidden">
         <div class="love-title">Besties for forever 🥰</div>
+        <p style="margin-top: 5px; color: #ccc;">صافي يا لبن؟ 🥛 من برة وجوة أحلى ذكريات</p>
         
         <div class="love-gallery">
             <img src="love1.jpg" alt="صورة 1">
@@ -268,20 +471,17 @@
         const slotsContainer = document.getElementById('puzzle-slots');
         const bankContainer = document.getElementById('pieces-bank');
         const totalPieces = 16;
-        let selectedPiece = null; // لتخزين القطعة المخترة حالياً
+        let activeDragPiece = null;
 
-        // إنشاء الخانات الفاضية فوق
         for (let i = 1; i <= totalPieces; i++) {
             const slot = document.createElement('div');
             slot.classList.add('slot');
             slot.setAttribute('data-slot-id', i);
-            
-            // عند الضغط على الخانة الفاضية
-            slot.addEventListener('click', handleSlotClick);
+            slot.addEventListener('dragover', e => e.preventDefault());
+            slot.addEventListener('drop', handleDrop);
             slotsContainer.appendChild(slot);
         }
 
-        // إنشاء القطع ولخبطتها تحت
         let pieceIds = Array.from({length: totalPieces}, (_, i) => i + 1);
         pieceIds.sort(() => Math.random() - 0.5);
 
@@ -289,41 +489,36 @@
             const img = document.createElement('img');
             img.src = `${id}.jpg`;
             img.classList.add('piece');
+            img.setAttribute('draggable', 'true');
             img.setAttribute('data-piece-id', id);
-            
-            // عند الضغط على القطعة لاختيارها
-            img.addEventListener('click', handlePieceClick);
-            
+            img.addEventListener('dragstart', function() { activeDragPiece = this; });
+            img.addEventListener('touchstart', handleTouchStart, {passive: false});
+            img.addEventListener('touchmove', handleTouchMove, {passive: false});
+            img.addEventListener('touchend', handleTouchEnd);
             bankContainer.appendChild(img);
         });
 
-        // منطق اختيار القطعة
-        function handlePieceClick(e) {
-            e.stopPropagation(); // منع التداخل
-            
-            // لو ضغطت على قطعة مختارة بالفعل، يلغي اختيارها
-            if (this.classList.contains('selected')) {
-                this.classList.remove('selected');
-                selectedPiece = null;
-                return;
+        function handleDrop(e) {
+            e.preventDefault();
+            if (!this.querySelector('img') && activeDragPiece) {
+                this.appendChild(activeDragPiece);
+                checkPuzzleStatus();
             }
-
-            // إلغاء تحديد أي قطعة تانية كانت مختارة
-            document.querySelectorAll('.piece').forEach(p => p.classList.remove('selected'));
-            
-            // تحديد القطعة الجديدة
-            this.classList.add('selected');
-            selectedPiece = this;
         }
 
-        // منطق وضع القطعة في الخانة
-        function handleSlotClick() {
-            // لو في قطعة مختارة والخانة دي فاضية (مفيهاش صورة)
-            if (selectedPiece && !this.querySelector('img')) {
-                selectedPiece.classList.remove('selected'); // إلغاء أنوار الاختيار
-                this.appendChild(selectedPiece); // نقل القطعة للخانة
-                selectedPiece = null; // تصفير الاختيار
-                checkPuzzleStatus(); // التأكد هل اللعبة خلصت؟
+        let touchStartElement = null;
+        function handleTouchStart(e) { touchStartElement = this; this.style.opacity = '0.6'; }
+        function handleTouchMove(e) { e.preventDefault(); }
+        function handleTouchEnd(e) {
+            this.style.opacity = '1';
+            const touch = e.changedTouches;
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (dropTarget) {
+                const slot = dropTarget.closest('.slot');
+                if (slot && !slot.querySelector('img')) {
+                    slot.appendChild(touchStartElement);
+                    checkPuzzleStatus();
+                }
             }
         }
 
@@ -335,12 +530,11 @@
                 const img = slot.querySelector('img');
                 if (img && slotId === img.getAttribute('data-piece-id')) correctCount++;
             });
-            
             if (correctCount === totalPieces) {
                 setTimeout(() => {
                     document.getElementById('step-game').classList.add('hidden');
                     document.getElementById('step-apology').classList.remove('hidden');
-                }, 400);
+                }, 500);
             }
         }
 
@@ -349,10 +543,126 @@
             document.getElementById('step-treaty').classList.remove('hidden');
         }
 
+        // دالة التوقيع والانتقال التلقائي لألبوم الصور
         function finalCelebrate() {
-            alert('تم الصلح بنجاح ❤️');
+            alert('تم الصلح بنجاح! ❤️ صافي يا لبن 🥛.. شكراً يا أحلى سلمى في الدنيا');
+            
+            // قفل صفحة محضر الصلح وفتح صفحة الـ 9 صور
             document.getElementById('step-treaty').classList.add('hidden');
             document.getElementById('step-final-love').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+
+        // 1. إنشاء الـ 16 خانة الفاضية فوق بالترتيب
+        for (let i = 1; i <= totalPieces; i++) {
+            const slot = document.createElement('div');
+            slot.classList.add('slot');
+            slot.setAttribute('data-slot-id', i);
+            
+            // أحداث استقبال السحب للكمبيوتر
+            slot.addEventListener('dragover', e => e.preventDefault());
+            slot.addEventListener('drop', handleDrop);
+            
+            slotsContainer.appendChild(slot);
+        }
+
+        // 2. إنشاء الـ 16 قطعة وتلخبيطهم تحت
+        let pieceIds = Array.from({length: totalPieces}, (_, i) => i + 1);
+        pieceIds.sort(() => Math.random() - 0.5); // لخبطة عشوائية
+
+        pieceIds.forEach(id => {
+            const img = document.createElement('img');
+            img.src = `${id}.jpg`; // سحب الصورة المقسمة
+            img.classList.add('piece');
+            img.setAttribute('draggable', 'true');
+            img.setAttribute('data-piece-id', id);
+
+            // أحداث السحب للكمبيوتر
+            img.addEventListener('dragstart', function() { activeDragPiece = this; });
+            
+            // أحداث السحب للموبايل (Touch)
+            img.addEventListener('touchstart', handleTouchStart, {passive: false});
+            img.addEventListener('touchmove', handleTouchMove, {passive: false});
+            img.addEventListener('touchend', handleTouchEnd);
+
+            bankContainer.appendChild(img);
+        });
+
+        // دالة الإفلات للكمبيوتر
+        function handleDrop(e) {
+            e.preventDefault();
+            if (!this.querySelector('img') && activeDragPiece) {
+                this.appendChild(activeDragPiece);
+                checkPuzzleStatus();
+            }
+        }
+
+        // دالات اللمس للموبايل
+        let touchStartElement = null;
+
+        function handleTouchStart(e) {
+            touchStartElement = this;
+            this.style.opacity = '0.6';
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault(); // منع اهتزاز الصفحة أثناء السحب
+        }
+
+        function handleTouchEnd(e) {
+            this.style.opacity = '1';
+            const touch = e.changedTouches;
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (dropTarget) {
+                const slot = dropTarget.closest('.slot');
+                if (slot && !slot.querySelector('img')) {
+                    slot.appendChild(touchStartElement);
+                    checkPuzzleStatus();
+                }
+            }
+        }
+
+        // دالة التحقق من الفوز للانتقال لصفحة الاعتذار
+        function checkPuzzleStatus() {
+            const slots = document.querySelectorAll('.slot');
+            let correctCount = 0;
+
+            slots.forEach(slot => {
+                const slotId = slot.getAttribute('data-slot-id');
+                const img = slot.querySelector('img');
+                
+                if (img) {
+                    const pieceId = img.getAttribute('data-piece-id');
+                    if (slotId === pieceId) {
+                        correctCount++;
+                    }
+                }
+            });
+
+            if (correctCount === totalPieces) {
+                setTimeout(() => {
+                    document.getElementById('step-game').classList.add('hidden');
+                    document.getElementById('step-apology').classList.remove('hidden');
+                }, 500);
+            }
+        }
+
+        function showTreaty() {
+            document.getElementById('step-apology').classList.add('hidden');
+            document.getElementById('step-treaty').classList.remove('hidden');
+        }
+
+        // دالة تفعيل زر الموافقة والتوقيع لسلمى
+        function finalCelebrate() {
+            alert('تم الصلح بنجاح ❤️');
+            const btn = document.querySelector('.btn-signature');
+            btn.innerText = 'تم التوقيع بنجاح ✅';
+            btn.style.color = 'green';
+            btn.style.borderColor = 'green';
+            btn.disabled = true;
         }
     </script>
 </body>
