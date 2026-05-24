@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>apologize mission  </title>
+    <title>apologize mission</title>
     <style>
         :root {
             --primary-color: #ff4a5a;
@@ -98,40 +98,66 @@
         button:hover { transform: scale(1.05); background: #e03e4d; }
 
         .apology-box p { font-size: 18px; line-height: 1.7; margin-bottom: 20px; }
-        .treaty-box { text-align: right; background: #252525; padding: 20px; border-radius: 15px; border-left: 5px solid var(--primary-color); }
-        .treaty-box h3 { text-align: center; color: var(--primary-color); margin-bottom: 15px; }
-        .treaty-box ul { margin-right: 20px; list-style: none; }
-        .treaty-box li { margin-bottom: 12px; position: relative; }
-        .treaty-box li::before { content: "❤️"; position: absolute; right: -25px; }
+
+        /* ستايل محضر الصلح المطور (الورقة الرسمية البيضاء) */
+        .reconciliation-paper {
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            line-height: 1.8;
+            width: 100%;
+        }
+
+        .paper-title { text-align: center; font-weight: bold; font-size: 20px; text-decoration: underline; margin-bottom: 10px; color: #111; }
+        .paper-subtitle { text-align: center; margin-bottom: 20px; font-weight: bold; color: #555; }
+        
+        /* تنسيق الصور لتكون صغيرة وجنب بعضها */
+        .parties-images { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
+        .party { text-align: center; }
+        .party img { width: 65px; height: 65px; border-radius: 50%; border: 2px solid #333; object-fit: cover; }
+        .party-name { display: block; font-weight: bold; font-size: 13px; margin-top: 5px; color: #222; }
+
+        .content-section { margin-bottom: 15px; font-size: 15px; }
+        .content-section p { font-weight: bold; }
+        .content-section ul { list-style: none; padding-right: 15px; }
+        .content-section li { color: #333; }
+
+        .signature-section { margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        
+        .btn-signature {
+            background: none; border: 2px solid #333; color: #333;
+            padding: 6px 20px; cursor: pointer; font-weight: bold;
+            font-size: 15px; border-radius: 5px; transition: 0.3s;
+            margin-top: 5px;
+        }
+        .btn-signature:hover { background: #f0f0f0; border-color: var(--primary-color); color: var(--primary-color); }
     </style>
 </head>
 <body>
 
-    <!-- الخطوة 1: اللعبة -->
     <div id="step-game" class="container">
         <h2>Scan Successful 👏🏻 </h2>
         <p>حلي ال puzzle دي بسرعه يا سلمي </p>
         
-        <!-- اللوحة الفاضية -->
         <div id="puzzle-slots"></div>
         
-        <!-- بنك القطع المتلخبطة -->
         <div id="pieces-bank"></div>
     </div>
 
-    <!-- الخطوة 2: رسالة الاعتذار -->
     <div id="step-apology" class="container hidden">
         <h2>شطووورة يا سلمي 😂❤️</h2>
         <div class="apology-box">
             <p> I’m really sorry for my attitude.</p>
-              <p>  You didn’t deserve that at all.</p>
-             <p>   I was upset and handled it badly.</p>
-         <p>   و عشان اضمن انك مش زعلانه مني 🌚</p>
+            <p> You didn’t deserve that at all.</p>
+            <p> I was upset and handled it badly.</p>
+            <p> و عشان اضمن انك مش زعلانه مني 🌚</p>
             <button onclick="showTreaty()">📜 يلا نعمل معاهدة صلح </button>
         </div>
     </div>
 
-    <!-- الخطوة 3: محضر الصلح -->
     <div id="step-treaty" class="container hidden" style="background: none; padding: 0;">
         <div class="reconciliation-paper">
             <div class="paper-title">محضر صلح رسمي</div>
@@ -172,12 +198,12 @@
 
             <div class="signature-section">
                 <div>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 5px; text-align: center;">إمضاء الطرف الثاني</p>
+                    <p style="font-size: 14px; color: #666;">إمضاء الطرف الثاني</p>
                     <button class="btn-signature" onclick="finalCelebrate()">سلمى أحمد</button>
                 </div>
-                <div style="text-align: center;">
-                    <p style="font-size: 14px; color: #666; margin-bottom: 5px;">إمضاء الطرف الأول</p>
-                    <p style="font-weight: bold; font-size: 18px; color: #111; font-family: 'Brush Script MT', cursive, sans-serif;">كريم ✨</p>
+                <div style="text-align: left;">
+                    <p style="font-size: 14px; color: #666;">إمضاء الطرف الأول</p>
+                    <p style="font-weight: bold; font-size: 16px; margin-top: 5px;">كريم ✨</p>
                 </div>
             </div>
         </div>
@@ -208,7 +234,7 @@
 
         pieceIds.forEach(id => {
             const img = document.createElement('img');
-            img.src = `${id}.jpg`; // سحب الصورة المقسمة (1.jpg, 2.jpg...)
+            img.src = `${id}.jpg`; // سحب الصورة المقسمة
             img.classList.add('piece');
             img.setAttribute('draggable', 'true');
             img.setAttribute('data-piece-id', id);
@@ -247,12 +273,10 @@
 
         function handleTouchEnd(e) {
             this.style.opacity = '1';
-            const touch = e.changedTouches[0];
-            // تحديد العنصر الموجود تحت الصباع عند الرفع
+            const touch = e.changedTouches;
             const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
             
             if (dropTarget) {
-                // البحث عن أقرب خانة (Slot) تحت نقطة اللمس
                 const slot = dropTarget.closest('.slot');
                 if (slot && !slot.querySelector('img')) {
                     slot.appendChild(touchStartElement);
@@ -261,7 +285,7 @@
             }
         }
 
-        // دالة التحقق من الفوز
+        // دالة التحقق من الفوز للانتقال لصفحة الاعتذار
         function checkPuzzleStatus() {
             const slots = document.querySelectorAll('.slot');
             let correctCount = 0;
@@ -272,14 +296,12 @@
                 
                 if (img) {
                     const pieceId = img.getAttribute('data-piece-id');
-                    // لو رقم القطعة بيطابق رقم الخانة بالظبط
                     if (slotId === pieceId) {
                         correctCount++;
                     }
                 }
             });
 
-            // لو الـ 16 قطعة كلهم في أماكنهم الصح
             if (correctCount === totalPieces) {
                 setTimeout(() => {
                     document.getElementById('step-game').classList.add('hidden');
@@ -293,8 +315,14 @@
             document.getElementById('step-treaty').classList.remove('hidden');
         }
 
-        function finalSuccess() {
-            alert('تم الصلح بنجاح! ❤️ صافي يا لبن 🥛');
+        // دالة تفعيل زر الموافقة والتوقيع لسلمى
+        function finalCelebrate() {
+            alert('تم الصلح بنجاح! ❤️ صافي يا لبن 🥛.. شكراً يا أحلى سلمى في الدنيا');
+            const btn = document.querySelector('.btn-signature');
+            btn.innerText = 'تم التوقيع بنجاح ✅';
+            btn.style.color = 'green';
+            btn.style.borderColor = 'green';
+            btn.disabled = true;
         }
     </script>
 </body>
